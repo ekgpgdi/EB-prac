@@ -17,32 +17,32 @@ jobs:
         with:
           python-version: "3.8"
 
-  #      zip으로 패키징하여 배포
-  - name: Generate deployment package
-      run: zip -r deploy.zip . -x '*.git*'
+      #      zip으로 패키징하여 배포
+      - name: Generate deployment package
+          run: zip -r deploy.zip . -x '*.git*'
 
-  #패키징한 zip파일에 타임을 넣기 위해
-  - name: Get timestamp
-      uses: gerred/actions/current-time@master
-      id: current-time
+      #패키징한 zip파일에 타임을 넣기 위해
+      - name: Get timestamp
+          uses: gerred/actions/current-time@master
+          id: current-time
 
-      - name: Run string replace
-        uses: frabert/replace-string-action@master
-        id: format-time
-        with:
-          pattern: '[:\.]+'
-          string: "${{ steps.current-time.outputs.time }}"
-          replace-with: '-'
-          flags: 'g'
+          - name: Run string replace
+            uses: frabert/replace-string-action@master
+            id: format-time
+            with:
+              pattern: '[:\.]+'
+              string: "${{ steps.current-time.outputs.time }}"
+              replace-with: '-'
+              flags: 'g'
 
-  #배포를 할 때 버전 라벨링을 해야 함 -> EB는 계속 배포가 되므로
-  - name: Deploy to EB
-      uses: einaregilsson/beanstalk-deploy@v16
-      with:
-        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: python-app
-        environment_name: Pythonapp-env
-        version_label: "python-${{ steps.format-time.outputs.replaced }}"
-        region: ap-northeast-2
-        deployment_package: deploy.zip
+      #배포를 할 때 버전 라벨링을 해야 함 -> EB는 계속 배포가 되므로
+      - name: Deploy to EB
+          uses: einaregilsson/beanstalk-deploy@v16
+          with:
+            aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            application_name: python-app
+            environment_name: Pythonapp-env
+            version_label: "python-${{ steps.format-time.outputs.replaced }}"
+            region: ap-northeast-2
+            deployment_package: deploy.zip
